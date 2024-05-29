@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1:3307
--- Tiempo de generación: 22-05-2024 a las 02:03:30
+-- Tiempo de generación: 29-05-2024 a las 03:52:06
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -25,11 +25,15 @@ DELIMITER $$
 --
 -- Procedimientos
 --
-CREATE DEFINER=`root`@`localhost` PROCEDURE `Pedido` ()   SELECT productos.Productos,tipo_producto.Tipo FROM ordenes
+CREATE DEFINER=`root`@`localhost` PROCEDURE `ppedido` (IN `oorden` INT(4), IN `tproducto` VARCHAR(6))   BEGIN
+SELECT ordenes.Orden, ordenes.Atendió, ordenes.Mesa, tipo_producto.Tipo, productos.Productos, productos.Precio, (SELECT SUM(productos.Precio) FROM productos JOIN ordenes_productos ON productos.Id = ordenes_productos.id_productos WHERE ordenes_productos.id_orden = ordenes.Orden) AS TotalFactura FROM ordenes
 JOIN ordenes_productos ON ordenes.Orden=ordenes_productos.id_orden
+JOIN meseros ON ordenes.Atendió=meseros.Id
 JOIN productos ON ordenes_productos.id_productos=productos.Id
 JOIN categorias_productos ON productos.Categoría = categorias_productos.Id
-JOIN tipo_producto ON categorias_productos.Tipo=tipo_producto.Id WHERE ordenes.Orden =1985 AND tipo_producto.Tipo= "Comida"$$
+JOIN tipo_producto ON categorias_productos.Tipo=tipo_producto.Id
+WHERE ordenes.Orden=oorden AND tipo_producto.Tipo=tproducto;
+END$$
 
 DELIMITER ;
 
